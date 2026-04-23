@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading — War Society</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=IM+Fell+English:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --ink: #1a1612;
+  --parchment: #f5f0e8;
+  --rust: #8b3a1e;
+  --rust-light: #c4501f;
+  --muted: #6b5e4e;
+  --faint: #d4c9b0;
+  --line: rgba(139,58,30,0.22);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--parchment);
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.45;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 4rem;
+  z-index: 100;
+  background: linear-gradient(to bottom, rgba(26,22,18,0.96) 60%, transparent);
+}
+
+.nav-logo {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--rust-light);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover,
+.nav-links a.active { color: var(--parchment); }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  padding: 10rem 4rem 5rem;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(139,58,30,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139,58,30,0.05) 1px, transparent 1px);
+  background-size: 72px 72px;
+  pointer-events: none;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  margin-bottom: 2rem;
+  transition: color 0.2s;
+}
+.back-link:hover { color: var(--rust-light); }
+
+.page-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--rust-light);
+  margin-bottom: 1.25rem;
+  opacity: 0;
+  animation: up 0.7s ease 0.1s forwards;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  color: var(--parchment);
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: up 0.7s ease 0.25s forwards;
+}
+
+.page-title em {
+  display: block;
+  color: var(--rust);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.page-intro {
+  max-width: 580px;
+  font-family: 'IM Fell English', serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--faint);
+  line-height: 1.85;
+  opacity: 0;
+  animation: up 0.7s ease 0.4s forwards;
+}
+
+/* ── MAIN CONTENT ── */
+main {
+  padding: 0 4rem 6rem;
+}
+
+/* ── PHILOSOPHY CALLOUT ── */
+.philosophy-box {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--rust);
+  padding: 2rem 2.5rem;
+  margin: 4rem 0;
+  max-width: 780px;
+}
+
+.philosophy-box p {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--parchment);
+  line-height: 1.75;
+}
+
+.philosophy-box cite {
+  display: block;
+  margin-top: 0.75rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rust-light);
+  font-style: normal;
+}
+
+/* ── MONTH GROUPS ── */
+.month-group {
+  margin-bottom: 1px;
+  border-bottom: 1px solid var(--line);
+}
+
+.month-header {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 2rem;
+  padding: 2.5rem 0 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.month-label {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--rust);
+  padding-top: 4px;
+}
+
+.month-theme {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--parchment);
+  line-height: 1.2;
+  margin-bottom: 0.35rem;
+}
+
+.month-desc {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ── BOOK CARD ── */
+.book-card {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 2rem;
+  padding: 2rem 0;
+  border-top: 1px solid rgba(139,58,30,0.1);
+  transition: background 0.2s;
+}
+
+.book-number {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 4px;
+  text-align: right;
+}
+
+.book-content { }
+
+.book-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--parchment);
+  margin-bottom: 0.2rem;
+}
+
+.book-author {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.book-what {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rust-light);
+  margin-bottom: 0.4rem;
+}
+
+.book-scope {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--line);
+  display: inline-block;
+}
+
+.book-lens {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.97rem;
+  color: var(--faint);
+  line-height: 1.8;
+  max-width: 560px;
+  margin-bottom: 1rem;
+}
+
+.book-concept {
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.concept-label {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 0.5rem;
+}
+
+.concept-body {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.92rem;
+  color: var(--faint);
+  line-height: 1.75;
+  max-width: 540px;
+}
+
+/* ── OPTIONAL READING ── */
+.optional-section {
+  padding: 4rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.optional-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--parchment);
+  margin-bottom: 0.5rem;
+}
+
+.optional-sub {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.92rem;
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 2rem;
+}
+
+.optional-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.optional-card {
+  border: 1px solid var(--line);
+  padding: 1.5rem;
+  transition: border-color 0.2s;
+}
+.optional-card:hover { border-color: var(--rust); }
+
+.opt-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--parchment);
+  margin-bottom: 0.2rem;
+}
+
+.opt-author {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+.opt-desc {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.88rem;
+  color: var(--faint);
+  line-height: 1.7;
+}
+
+/* ── NOTES METHOD ── */
+.notes-box {
+  background: rgba(139,58,30,0.06);
+  border: 1px solid var(--line);
+  padding: 2.5rem 3rem;
+  margin: 3rem 0;
+  max-width: 680px;
+}
+
+.notes-label {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--rust-light);
+  margin-bottom: 1rem;
+}
+
+.notes-body {
+  font-family: 'IM Fell English', serif;
+  font-size: 1rem;
+  color: var(--faint);
+  line-height: 1.85;
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 2rem 4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--line);
+}
+
+.footer-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--rust-light);
+}
+
+.footer-note {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+}
+
+/* ── ANIMATIONS ── */
+@keyframes up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.in { opacity: 1; transform: none; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 1.25rem 1.5rem; }
+  .nav-links { display: none; }
+  .page-header, main { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .month-header, .book-card { grid-template-columns: 1fr; gap: 0.5rem; }
+  .book-number { text-align: left; }
+  .optional-grid { grid-template-columns: 1fr; }
+  footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">War Society</a>
+  <ul class="nav-links">
+    <li><a href="index.html#format">The Format</a></li>
+    <li><a href="index.html#session">Session I</a></li>
+    <li><a href="reading.html" class="active">Reading</a></li>
+    <li><a href="index.html#apply">Apply</a></li>
+  </ul>
+</nav>
+
+<!-- ── PAGE HEADER ── -->
+<div class="page-header">
+  <a href="index.html" class="back-link">← Back to War Society</a>
+  <p class="page-eyebrow">Preparation — 4 months to session I</p>
+  <h1 class="page-title">
+    The Reading<br>
+    <em>Curriculum.</em>
+  </h1>
+  <p class="page-intro">
+    Each book builds directly on the last. By session one you have four intellectual lenses that work together in every game: geography, war as political logic, scenario construction, actor incentives, and system consequences.
+  </p>
+</div>
+
+<main>
+
+  <div class="philosophy-box reveal">
+    <p>The reason war games work intellectually is that they force you to think in constraints, not preferences. A country does not invade because it is evil — it invades because it has a 300 km indefensible plain to its west, no warm-water port, and an election in 6 months. Once you think that way, every scenario becomes tractable.</p>
+    <cite>War Society — Core Principle</cite>
+  </div>
+
+  <!-- ── MONTH 1 ── -->
+  <div class="month-group reveal">
+    <div class="month-header">
+      <span class="month-label">Month 1</span>
+      <div>
+        <p class="month-theme">The Foundation</p>
+        <p class="month-desc">Why geography is destiny — and why war is politics by another name.</p>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <span class="book-number">Book 01</span>
+      <div class="book-content">
+        <h2 class="book-title">Prisoners of Geography</h2>
+        <p class="book-author">Tim Marshall</p>
+        <p class="book-what">What to read</p>
+        <div class="book-scope">All chapters — re-read with annotation</div>
+        <p class="book-lens">The founding lens of the club. Every scenario you build starts with a map, and this book teaches you what to look for on it. Re-read with annotation: what resource, what border, what chokepoint.</p>
+        <div class="book-concept">
+          <p class="concept-label">Core concept</p>
+          <p class="concept-body">States do not choose their behaviour — their geography does it for them. A country with no warm-water port will always be desperate for one. Russia's obsession with buffer states, China's non-negotiable position on the South China Sea, the Middle East's arbitrary colonial borders — geography explains all of it.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <span class="book-number">Book 02</span>
+      <div class="book-content">
+        <h2 class="book-title">On War</h2>
+        <p class="book-author">Carl von Clausewitz — Book I only</p>
+        <p class="book-what">What to read</p>
+        <div class="book-scope">Book I only — approx. 80 pages (Howard &amp; Paret translation)</div>
+        <p class="book-lens">The philosophical backbone of the club. Justifies the entire Act III economic autopsy — if war is politics, then every military decision is also an economic decision.</p>
+        <div class="book-concept">
+          <p class="concept-label">Three concepts to extract</p>
+          <p class="concept-body">War is the continuation of politics by other means. Friction — plans never survive contact with reality. The fog of war — actors make decisions with incomplete information. Your sessions must replicate all three.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MONTH 2 ── -->
+  <div class="month-group reveal">
+    <div class="month-header">
+      <span class="month-label">Month 2</span>
+      <div>
+        <p class="month-theme">Scenario Building</p>
+        <p class="month-desc">Structured uncertainty — how to construct a scenario that does not collapse into opinion.</p>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <span class="book-number">Book 03</span>
+      <div class="book-content">
+        <h2 class="book-title">The Art of the Long View</h2>
+        <p class="book-author">Peter Schwartz</p>
+        <p class="book-what">What to read</p>
+        <div class="book-scope">Chapters 1–6 — approx. 120 pages</div>
+        <p class="book-lens">The Act I construction method. After reading this, you can build a scenario card in 30 minutes. You will know how to set the stakes without predetermining the outcome.</p>
+        <div class="book-concept">
+          <p class="concept-label">The key framework</p>
+          <p class="concept-body">Two axes — Predetermined (things that will happen regardless: geography, demographics, debt levels) and Uncertain (things that could go either way: elections, a leader's health, weather). Plot a 2×2 grid of scenarios from the intersections. Each quadrant is a plausible future. None is the correct one.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MONTH 3 ── -->
+  <div class="month-group reveal">
+    <div class="month-header">
+      <span class="month-label">Month 3</span>
+      <div>
+        <p class="month-theme">Actor Logic</p>
+        <p class="month-desc">Why states do what they do — incentives, deterrence, credible commitment.</p>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <span class="book-number">Book 04</span>
+      <div class="book-content">
+        <h2 class="book-title">The Strategy of Conflict</h2>
+        <p class="book-author">Thomas Schelling — Nobel Prize in Economics, 2005</p>
+        <p class="book-what">What to read</p>
+        <div class="book-scope">Chapters 1, 2, 3 — approx. 80 pages. Read slowly.</div>
+        <p class="book-lens">The engine of Act II. Dense but precise. Each actor card in your sessions has a public commitment section — something the actor has said publicly that they cannot walk back. Schelling explains precisely why those commitments trap actors into moves they might not otherwise choose.</p>
+        <div class="book-concept">
+          <p class="concept-label">Four concepts to master</p>
+          <p class="concept-body">A threat is only useful if it is credible — an incredible threat reveals weakness. Credible commitment: why backing down from a public commitment is often more costly than the original conflict. Deterrence by denial vs. deterrence by punishment. Schelling's focal points — why actors sometimes coordinate without communicating.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MONTH 4 ── -->
+  <div class="month-group reveal">
+    <div class="month-header">
+      <span class="month-label">Month 4</span>
+      <div>
+        <p class="month-theme">Consequences</p>
+        <p class="month-desc">Systems and economic fallout — seeing feedback loops in geopolitical decisions.</p>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <span class="book-number">Book 05</span>
+      <div class="book-content">
+        <h2 class="book-title">Thinking in Systems</h2>
+        <p class="book-author">Donella Meadows</p>
+        <p class="book-what">What to read</p>
+        <div class="book-scope">All — 220 pages. One of the most efficient books you will read.</div>
+        <p class="book-lens">The language and method for the Act III economic autopsy. After each session, you draw the causal feedback loop on the whiteboard. Meadows teaches you to trace that chain — not intuitively but structurally. This is what separates War Society from a debate club.</p>
+        <div class="book-concept">
+          <p class="concept-label">What to understand</p>
+          <p class="concept-body">Feedback loops: every action creates a response that feeds back into the original system. Stocks and flows: how resources accumulate and deplete. System archetypes: 'escalation', 'tragedy of the commons', 'shifting the burden' — these are recurring patterns in every geopolitical scenario you will ever run.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── READING NOTES METHOD ── -->
+  <div class="notes-box reveal">
+    <p class="notes-label">Reading Notes Method</p>
+    <p class="notes-body">After finishing each book, write one page of notes — not a summary, but three ideas you could explain clearly to someone else. By month four you have four pages. That is your personal facilitator's handbook for every session that follows.</p>
+  </div>
+
+  <!-- ── OPTIONAL ── -->
+  <div class="optional-section reveal">
+    <h3 class="optional-title">Optional — add after month four</h3>
+    <p class="optional-sub">For members who want to go deeper before session two.</p>
+    <div class="optional-grid">
+      <div class="optional-card">
+        <p class="opt-title">Thinking, Fast and Slow</p>
+        <p class="opt-author">Daniel Kahneman</p>
+        <p class="opt-desc">Why actors make irrational decisions under pressure. Adds a behavioural layer to Schelling — the missing piece when structural logic fails to explain a move.</p>
+      </div>
+      <div class="optional-card">
+        <p class="opt-title">The Sleepwalkers</p>
+        <p class="opt-author">Christopher Clark</p>
+        <p class="opt-desc">How WWI actually started. The best case study in unintended escalation ever written. Essential reading for understanding friction card logic.</p>
+      </div>
+      <div class="optional-card">
+        <p class="opt-title">Prisoners of Geography: 10 Maps</p>
+        <p class="opt-author">Tim Marshall (follow-up)</p>
+        <p class="opt-desc">Maps focused on Africa, the Arctic, and climate. Future session material — the geography of the next generation of crises.</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">War Society</div>
+  <p class="footer-note">Think in constraints. Not preferences.</p>
+  <p class="footer-note"><a href="index.html#apply" style="color:var(--muted);text-decoration:none;">Apply for Session I →</a></p>
+</footer>
+
+<script>
+const els = document.querySelectorAll('.reveal');
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('in'), i * 60);
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.06 });
+els.forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
