@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>War Society — The Charter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=IM+Fell+English:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1612;
+    --parchment: #f5f0e8;
+    --rust: #8b3a1e;
+    --rust-light: #c4501f;
+    --muted: #9a8a78;
+    --faint: #ddd3bc;
+    --line: rgba(139,58,30,0.22);
+    --line-light: rgba(139,58,30,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: #ffffff;
+    color: var(--ink);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── Nav ── */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 48px;
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    background: #ffffff;
+    z-index: 100;
+  }
+
+  .nav-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--rust); }
+  .nav-links a.active { color: var(--rust-light); }
+
+  /* ── Page ── */
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 72px 48px 120px;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    margin-bottom: 72px;
+    opacity: 0;
+    animation: fadein 0.8s ease 0.1s forwards;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust-light);
+    margin-bottom: 20px;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 7vw, 72px);
+    font-weight: 900;
+    line-height: 1.0;
+    color: var(--ink);
+    margin-bottom: 32px;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    font-weight: 700;
+    color: var(--rust);
+  }
+
+  .hero-intro {
+    font-family: 'IM Fell English', serif;
+    font-size: 20px;
+    line-height: 1.65;
+    color: var(--ink);
+    max-width: 580px;
+    border-left: 2px solid var(--rust);
+    padding-left: 24px;
+  }
+
+  .peace-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    padding: 9px 18px;
+    margin-top: 32px;
+  }
+
+  .peace-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1.5px solid var(--rust);
+    flex-shrink: 0;
+  }
+
+  /* ── Sections ── */
+  .section {
+    margin-bottom: 56px;
+    opacity: 0;
+    animation: fadein 0.8s ease forwards;
+  }
+
+  .section-header {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    align-items: baseline;
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .section-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--rust);
+    letter-spacing: 0.1em;
+  }
+
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── Rules ── */
+  .rules { list-style: none; }
+
+  .rule {
+    padding: 26px 0;
+    border-bottom: 1px solid var(--line-light);
+  }
+
+  .rule:last-child { border-bottom: none; }
+
+  .rule-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+
+  .rule-headline em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--rust);
+  }
+
+  .rule-body {
+    font-family: 'IM Fell English', serif;
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+
+  /* ── Prohibited ── */
+  .prohibited {
+    background: var(--parchment);
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--rust);
+    padding: 28px 32px;
+    margin-top: 4px;
+  }
+
+  .prohibited-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 20px;
+  }
+
+  .prohibited-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .prohibited-list li {
+    font-family: 'IM Fell English', serif;
+    font-size: 17px;
+    color: var(--ink);
+    line-height: 1.6;
+    padding-left: 22px;
+    position: relative;
+  }
+
+  .prohibited-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--rust);
+  }
+
+  /* ── Pull quote ── */
+  .manifesto {
+    margin: 64px 0;
+    padding: 52px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    text-align: center;
+    opacity: 0;
+    animation: fadein 0.9s ease forwards;
+    animation-delay: 0.8s;
+  }
+
+  .manifesto-text {
+    font-family: 'IM Fell English', serif;
+    font-size: clamp(20px, 3vw, 27px);
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--ink);
+    max-width: 540px;
+    margin: 0 auto 20px;
+  }
+
+  .manifesto-attr {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .footer-left {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .footer-right {
+    font-family: 'IM Fell English', serif;
+    font-size: 15px;
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  /* ── Animations ── */
+  @keyframes fadein {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .s1 { animation-delay: 0.2s; }
+  .s2 { animation-delay: 0.3s; }
+  .s3 { animation-delay: 0.4s; }
+  .s4 { animation-delay: 0.5s; }
+  .s5 { animation-delay: 0.6s; }
+  .s6 { animation-delay: 0.7s; }
+
+  @media (max-width: 600px) {
+    nav { padding: 20px 24px; }
+    .nav-links { gap: 20px; }
+    .page { padding: 48px 24px 80px; }
+    .hero-title { font-size: 40px; }
+    .footer { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">War Society</a>
+  <ul class="nav-links">
+    <li><a href="#">Sessions</a></li>
+    <li><a href="#">Reading</a></li>
+    <li><a href="#" class="active">Charter</a></li>
+    <li><a href="#">Archive</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+
+  <section class="hero">
+    <p class="hero-eyebrow">Society Charter</p>
+    <h1 class="hero-title">The rules<br>of <em>the room</em></h1>
+    <p class="hero-intro">This is not a debate club. It is not a lecture. It is an analytical exercise — and the quality of the analysis depends entirely on how members speak to one another.</p>
+    <div class="peace-note">
+      <span class="peace-dot"></span>
+      The one white page — conduct, clarity, and the presumption of good faith
+    </div>
+  </section>
+
+  <section class="section s1">
+    <div class="section-header">
+      <span class="section-num">I</span>
+      <span class="section-title">How we speak</span>
+    </div>
+    <ul class="rules">
+      <li class="rule">
+        <div class="rule-headline">Argue the <em>position</em>, not the person</div>
+        <div class="rule-body">Challenge what someone said, not who they are. If you disagree with a move, name the structural reason it fails — do not name the player who made it. The actor at the table is not the country they are playing.</div>
+      </li>
+      <li class="rule">
+        <div class="rule-headline">Speak in <em>constraints</em>, not preferences</div>
+        <div class="rule-body">The word "should" signals an opinion. Replace it, always, with "can, given the constraints." This is not a stylistic rule — it is the entire intellectual method of the club. Members who cannot make this shift are not yet thinking analytically.</div>
+      </li>
+      <li class="rule">
+        <div class="rule-headline">One voice at a time. <em>Always.</em></div>
+        <div class="rule-body">You will be heard. Interrupting does not make your point stronger — it signals that you stopped listening before the other person finished. Wait. The room rewards patience.</div>
+      </li>
+      <li class="rule">
+        <div class="rule-headline">Short sentences carry <em>more weight</em> than long ones</div>
+        <div class="rule-body">A precise observation in two sentences is worth more than a rambling paragraph. Practise saying what you mean in fewer words. The members who speak most clearly, not most often, shape the session.</div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="section s2">
+    <div class="section-header">
+      <span class="section-num">II</span>
+      <span class="section-title">How we disagree</span>
+    </div>
+    <ul class="rules">
+      <li class="rule">
+        <div class="rule-headline">Disagreement is <em>the point</em></div>
+        <div class="rule-body">This club exists because geopolitics is genuinely contested. Two members can analyse the same scenario and reach opposite conclusions — both can be structurally valid. Disagreement is not a failure of the session. Agreement reached too quickly is.</div>
+      </li>
+      <li class="rule">
+        <div class="rule-headline">State your <em>evidence</em>, then your conclusion</div>
+        <div class="rule-body">Do not lead with a claim and hunt for justification afterwards. Lead with the structural fact — the geography, the debt level, the public commitment — and let the conclusion follow naturally. If the conclusion cannot survive that order, it is not a conclusion.</div>
+      </li>
+      <li class="rule">
+        <div class="rule-headline">Concede when the argument is <em>lost</em></div>
+        <div class="rule-body">If someone makes a point that invalidates yours, say so. "That changes my read" is one of the most analytically honest sentences in the room. Members who cannot concede lose credibility faster than members who are occasionally wrong and admit it.</div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="section s3">
+    <div class="section-header">
+      <span class="section-num">III</span>
+      <span class="section-title">How we prepare</span>
+    </div>
+    <ul class="rules">
+      <li class="rule">
+        <div class="rule-headline">Come having <em>read</em> the material</div>
+        <div class="rule-body">The assigned reading is not optional context — it is the shared vocabulary of the session. Members who have not read it consume the time of those who have. If you did not read it, say so at the start. Do not discover this mid-session.</div>
+      </li>
+      <li class="rule">
+        <div class="rule-headline">Bring your <em>ignorance</em>, not your certainty</div>
+        <div class="rule-body">The most useful question in a session is one you genuinely do not know the answer to. Performing expertise degrades the room. A sincere "I don't know — what would the map tell us?" is worth more than a confident wrong answer.</div>
+      </li>
+      <li class="rule">
+        <div class="rule-headline">Your actor card is a <em>constraint</em>, not a character</div>
+        <div class="rule-body">Playing Russia does not mean you endorse Russia. You are modelling structural logic, not performing ideological allegiance. The quality of your analysis depends on your willingness to argue for a position you personally reject.</div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="section s4">
+    <div class="section-header">
+      <span class="section-num">IV</span>
+      <span class="section-title">How we treat each other</span>
+    </div>
+    <ul class="rules">
+      <li class="rule">
+        <div class="rule-headline">Standing is <em>earned</em> at the table, not assumed</div>
+        <div class="rule-body">A member's worth in a session is measured by the quality of their structural reasoning — not their background, nationality, politics, or how long they have been a member. The newest member who makes the most precise observation wins the room.</div>
+      </li>
+      <li class="rule">
+        <div class="rule-headline">No <em>mockery</em> of a move, ever</div>
+        <div class="rule-body">If a player makes a structurally poor decision, engage with it analytically. There is almost always a structural logic behind even terrible decisions — that is precisely what makes real geopolitics so dangerous. Mocking a move closes the most interesting question in the room.</div>
+      </li>
+      <li class="rule">
+        <div class="rule-headline">The room is <em>confidential</em></div>
+        <div class="rule-body">What is said in session stays in session. Members take the structural lessons with them — not the specific words, attributions, or positions of individual players. This is what makes it possible to argue a position you do not actually hold.</div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="section s5">
+    <div class="section-header">
+      <span class="section-num">V</span>
+      <span class="section-title">What is not permitted</span>
+    </div>
+    <div class="prohibited">
+      <p class="prohibited-title">These behaviours end the session or end the membership</p>
+      <ul class="prohibited-list">
+        <li>Moral characterisation of actors in place of structural analysis. "Russia is evil" is not a move. It is a reason to stop the session.</li>
+        <li>Personal attacks on other members — for their position, their background, or the actor they were assigned.</li>
+        <li>Performative certainty about genuinely uncertain things. Claiming to know what a government will do is not analysis. It is noise.</li>
+        <li>Bringing personal politics to the table as evidence. Your allegiances are not a structural argument. They do not belong here.</li>
+        <li>Repeating a point that has already been refuted without addressing the refutation. Say something new or yield the floor.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="manifesto">
+    <p class="manifesto-text">"The reason war games work intellectually is that they force you to think in constraints, not preferences."</p>
+    <p class="manifesto-attr">War Society — Reading Curriculum</p>
+  </div>
+
+  <section class="section s6">
+    <div class="section-header">
+      <span class="section-num">VI</span>
+      <span class="section-title">The standard we hold ourselves to</span>
+    </div>
+    <ul class="rules">
+      <li class="rule">
+        <div class="rule-headline">Leave <em>less certain</em> than you arrived</div>
+        <div class="rule-body">Certainty that survives a session was not tested. The mark of a good session is not that everyone agreed on an outcome — it is that everyone left with a sharper sense of what they do not yet understand. That is the only intellectual progress worth making.</div>
+      </li>
+      <li class="rule">
+        <div class="rule-headline">The best analysis <em>costs</em> you something</div>
+        <div class="rule-body">If your argument never required you to defend a position you find uncomfortable, you have not been challenged. Play the actor you were given. Make the case the evidence demands. The discomfort is not a side effect of good analysis — it is the proof that it happened.</div>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="footer">
+    <span class="footer-left">War Society — Charter v1</span>
+    <span class="footer-right">For the room. Not the record.</span>
+  </footer>
+
+</div>
+</body>
+</html>
