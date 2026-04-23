@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>War Society — Trial Session</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=IM+Fell+English:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1612;
+    --parchment: #f5f0e8;
+    --rust: #8b3a1e;
+    --rust-light: #c4501f;
+    --muted: #9a8a78;
+    --faint: #ddd3bc;
+    --line: rgba(139,58,30,0.22);
+    --line-faint: rgba(139,58,30,0.1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--parchment);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── Nav ── */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 48px;
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    background: var(--ink);
+    z-index: 100;
+  }
+  .nav-logo { font-family:'Space Mono',monospace; font-size:11px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--rust-light); text-decoration:none; }
+  .nav-links { display:flex; gap:32px; list-style:none; }
+  .nav-links a { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+  .nav-links a:hover { color:var(--parchment); }
+  .nav-links a.active { color:var(--rust-light); }
+
+  /* ── Screens ── */
+  .screen { display:none; }
+  .screen.active { display:block; }
+
+  /* ── Page shell ── */
+  .page { max-width:720px; margin:0 auto; padding:64px 48px 120px; }
+
+  /* ── Progress bar ── */
+  .progress { display:flex; gap:6px; margin-bottom:52px; align-items:center; flex-wrap:wrap; }
+  .prog-step { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; display:flex; align-items:center; gap:5px; }
+  .prog-step.done { color:var(--rust); }
+  .prog-step.current { color:var(--parchment); }
+  .prog-dot { width:5px; height:5px; border-radius:50%; background:currentColor; flex-shrink:0; }
+  .prog-sep { color:var(--muted); font-size:10px; margin:0 2px; }
+
+  /* ── Typography ── */
+  .eyebrow { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--rust-light); margin-bottom:16px; }
+
+  .big-title { font-family:'Playfair Display',serif; font-size:clamp(40px,6vw,62px); font-weight:900; line-height:1.0; color:var(--parchment); margin-bottom:28px; }
+  .big-title em { font-style:italic; font-weight:700; color:var(--rust-light); }
+
+  .section-title { font-family:'Playfair Display',serif; font-size:clamp(28px,4vw,40px); font-weight:900; line-height:1.05; color:var(--parchment); margin-bottom:24px; }
+  .section-title em { font-style:italic; font-weight:700; color:var(--rust-light); }
+
+  .body-text { font-family:'IM Fell English',serif; font-size:18px; line-height:1.7; color:var(--faint); margin-bottom:20px; }
+
+  .divider { border:none; border-top:1px solid var(--line); margin:40px 0; }
+
+  /* ── Scenario / info boxes ── */
+  .scenario-box { border:1px solid var(--line); border-left:2px solid var(--rust); padding:28px 32px; margin:28px 0; background:rgba(139,58,30,0.06); }
+  .scenario-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--rust-light); margin-bottom:12px; }
+  .scenario-text { font-family:'IM Fell English',serif; font-size:17px; line-height:1.75; color:var(--parchment); }
+
+  /* ── Actor card ── */
+  .actor-card { border:1px solid var(--rust); padding:28px 32px; margin:32px 0; position:relative; }
+  .actor-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--rust); }
+  .actor-card-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--line); }
+  .actor-name { font-family:'Playfair Display',serif; font-size:24px; font-weight:700; color:var(--parchment); }
+  .actor-role { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.12em; color:var(--muted); }
+  .card-field { margin-bottom:16px; }
+  .card-field:last-child { margin-bottom:0; }
+  .field-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--rust-light); margin-bottom:5px; }
+  .field-val { font-family:'IM Fell English',serif; font-size:17px; line-height:1.65; color:var(--faint); }
+  .field-val em { font-style:italic; color:var(--parchment); }
+
+  /* ── Move choices ── */
+  .move-prompt { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:20px; margin-top:40px; }
+  .move-options { display:flex; flex-direction:column; gap:14px; }
+  .move-btn { background:none; border:1px solid var(--line); padding:22px 28px; text-align:left; cursor:pointer; transition:border-color 0.2s, background 0.2s; display:block; width:100%; }
+  .move-btn:hover { border-color:var(--rust); background:rgba(139,58,30,0.08); }
+  .move-btn-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--rust-light); margin-bottom:8px; display:block; }
+  .move-btn-title { font-family:'Playfair Display',serif; font-size:19px; font-weight:700; color:var(--parchment); margin-bottom:6px; display:block; }
+  .move-btn-desc { font-family:'IM Fell English',serif; font-size:17px; line-height:1.6; color:var(--muted); display:block; }
+
+  /* ── Events (animated in) ── */
+  .event { border:1px solid var(--line); padding:22px 26px; margin:16px 0; opacity:0; transform:translateY(8px); transition:opacity 0.5s ease, transform 0.5s ease; }
+  .event.visible { opacity:1; transform:translateY(0); }
+  .event-actor { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; margin-bottom:8px; }
+  .event-actor.russia { color:#c4501f; }
+  .event-actor.nato { color:#6b9ec7; }
+  .event-actor.washington { color:#7ec4a0; }
+  .event-text { font-family:'IM Fell English',serif; font-size:17px; line-height:1.65; color:var(--parchment); }
+
+  /* ── Friction card ── */
+  .friction-card { border:1px solid var(--rust); background:rgba(139,58,30,0.1); padding:32px 36px; margin:44px 0 28px; text-align:center; opacity:0; transform:translateY(12px); transition:opacity 0.6s ease, transform 0.6s ease; }
+  .friction-card.visible { opacity:1; transform:translateY(0); }
+  .friction-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.25em; text-transform:uppercase; color:var(--rust-light); margin-bottom:14px; }
+  .friction-title { font-family:'Playfair Display',serif; font-size:28px; font-weight:900; color:var(--parchment); margin-bottom:16px; }
+  .friction-text { font-family:'IM Fell English',serif; font-size:17px; line-height:1.75; color:var(--faint); max-width:520px; margin:0 auto; }
+
+  /* ── Round 2 context box ── */
+  .r2-context { border:1px solid var(--line); border-left:2px solid var(--faint); padding:22px 28px; margin:28px 0; background:rgba(245,240,232,0.04); }
+  .r2-context-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--faint); margin-bottom:10px; }
+  .r2-context-text { font-family:'IM Fell English',serif; font-size:17px; line-height:1.65; color:var(--faint); }
+
+  /* ── Autopsy ── */
+  .autopsy-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--rust-light); margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--line); }
+  .chain { display:flex; flex-direction:column; gap:0; margin:28px 0 32px; }
+  .chain-step { display:grid; grid-template-columns:22px 1fr; gap:14px; padding:14px 0; border-bottom:1px solid var(--line-faint); align-items:start; }
+  .chain-step:last-child { border-bottom:none; }
+  .chain-arrow { font-family:'Space Mono',monospace; font-size:13px; color:var(--rust); padding-top:3px; }
+  .chain-text { font-family:'IM Fell English',serif; font-size:17px; line-height:1.65; color:var(--faint); }
+  .chain-text strong { font-style:italic; color:var(--parchment); font-weight:400; }
+
+  .cost-box { border:1px solid var(--line); border-left:2px solid var(--rust-light); padding:20px 24px; margin:12px 0; }
+  .cost-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--rust-light); margin-bottom:8px; }
+  .cost-text { font-family:'IM Fell English',serif; font-size:17px; line-height:1.65; color:var(--faint); }
+
+  .lesson-box { border:1px solid var(--rust); border-left:2px solid var(--rust); padding:24px 28px; margin:20px 0; background:rgba(139,58,30,0.07); }
+  .lesson-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--rust-light); margin-bottom:10px; }
+  .lesson-text { font-family:'IM Fell English',serif; font-size:18px; font-style:italic; line-height:1.65; color:var(--parchment); }
+
+  /* ── Cliffhanger ── */
+  .cliffhanger { border:1px solid var(--rust); padding:40px; margin:40px 0; text-align:center; }
+  .cliff-text { font-family:'IM Fell English',serif; font-size:20px; font-style:italic; line-height:1.65; color:var(--parchment); margin-bottom:24px; }
+  .cliff-sub { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:32px; line-height:1.9; }
+
+  /* ── Buttons ── */
+  .btn-primary { display:inline-block; font-family:'Space Mono',monospace; font-size:11px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; background:var(--rust); color:var(--parchment); border:none; padding:14px 32px; cursor:pointer; text-decoration:none; transition:background 0.2s; }
+  .btn-primary:hover { background:var(--rust-light); color:var(--parchment); }
+  .btn-ghost { display:inline-block; font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; background:none; color:var(--muted); border:1px solid var(--line); padding:13px 28px; cursor:pointer; text-decoration:none; transition:color 0.2s, border-color 0.2s; }
+  .btn-ghost:hover { color:var(--parchment); border-color:var(--faint); }
+  .btn-row { margin-top:32px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+
+  .hidden { display:none; }
+
+  @keyframes fadein { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+  .fadein { animation:fadein 0.7s ease forwards; }
+
+  @media(max-width:600px){
+    nav{padding:20px 24px;}
+    .nav-links{gap:16px;}
+    .page{padding:40px 24px 80px;}
+    .actor-card-header{flex-direction:column;gap:4px;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">War Society</a>
+  <ul class="nav-links">
+    <li><a href="index.html#format">The Format</a></li>
+    <li><a href="index.html#session">Sessions</a></li>
+    <li><a href="reading.html">Reading</a></li>
+    <li><a href="war_society_charter.html">Charter</a></li>
+    <li><a href="trial.html" class="active">Try It</a></li>
+    <li><a href="index.html#apply">Apply</a></li>
+  </ul>
+</nav>
+
+
+<!-- ══════════════════════════════════════════
+     SCREEN: INTRO
+══════════════════════════════════════════ -->
+<div id="s-intro" class="screen active">
+<div class="page">
+  <div class="progress">
+    <span class="prog-step current"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step">Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step">Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step">Autopsy</span>
+  </div>
+
+  <p class="eyebrow">Trial Session — The Northern Flank</p>
+  <h1 class="big-title">Two rounds.<br>Three choices.<br><em>One lesson.</em></h1>
+  <p class="body-text">This is a condensed War Society session. You play one actor, make two moves, and live with their consequences — up to and through the first friction card.</p>
+  <p class="body-text">There are no right answers. There are only moves and what they cost.</p>
+
+  <div class="scenario-box">
+    <div class="scenario-label">The situation</div>
+    <p class="scenario-text">It is winter. Finland joined NATO 14 months ago. Russia has moved 40,000 troops to the Finnish border, citing NATO provocations. No shot has been fired. Article 5 has not been triggered. The EU has imposed a new sanctions package. Gas flows through Ukraine have stopped. Germany is rationing energy. It is week 3 of the standoff.</p>
+  </div>
+
+  <div class="scenario-box">
+    <div class="scenario-label">The opening move</div>
+    <p class="scenario-text">Russia has just announced live-fire military exercises 50 km from your border. Framed as routine. Legal under international law. 40,000 troops are visible. No shot has been fired — yet.</p>
+  </div>
+
+  <p class="body-text" style="margin-top:28px;">You are <span style="font-family:'Playfair Display',serif;font-size:20px;color:var(--parchment);font-style:italic;">Finland.</span></p>
+
+  <div class="btn-row">
+    <button class="btn-primary" onclick="go('s-card')">Read your actor card →</button>
+  </div>
+</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SCREEN: ACTOR CARD
+══════════════════════════════════════════ -->
+<div id="s-card" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step">Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step">Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step">Autopsy</span>
+  </div>
+
+  <p class="eyebrow">Your actor card</p>
+  <h2 class="big-title">Finland</h2>
+
+  <div class="actor-card">
+    <div class="actor-card-header">
+      <span class="actor-name">Finland</span>
+      <span class="actor-role">The frontline actor</span>
+    </div>
+    <div class="card-field">
+      <div class="field-label">Win condition</div>
+      <div class="field-val">Survive the standoff without economic collapse. Force NATO into a <em>concrete, binding</em> security commitment — not just words.</div>
+    </div>
+    <div class="card-field">
+      <div class="field-label">Geographic reality</div>
+      <div class="field-val">1,340 km of open border with Russia. No mountains. Helsinki is a peninsula — blockadable by sea. You fought Russia before: the Winter War, 1939. You held for 3.5 months when no one expected you to.</div>
+    </div>
+    <div class="card-field">
+      <div class="field-label">Hard constraints</div>
+      <div class="field-val">280,000 trained reservists. Economy is export-dependent — a naval blockade collapses trade within weeks. You joined NATO for protection, but protection requires NATO to act. NATO cannot invoke Article 5 without a direct, attributable attack.</div>
+    </div>
+    <div class="card-field">
+      <div class="field-label">Public commitment — cannot be walked back</div>
+      <div class="field-val" style="font-style:italic;color:var(--parchment);">"We will defend every inch of Finnish territory." Any capitulation before an actual attack undermines the entire case for your NATO membership — and sets a precedent no Nordic state can afford.</div>
+    </div>
+  </div>
+
+  <p class="body-text">Your move must be consistent with these constraints — not with what you personally think Finland should do.</p>
+
+  <div class="btn-row">
+    <button class="btn-primary" onclick="go('s-r1')">Make your first move →</button>
+  </div>
+</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SCREEN: ROUND 1 — CHOOSE
+══════════════════════════════════════════ -->
+<div id="s-r1" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step">Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step">Autopsy</span>
+  </div>
+
+  <p class="eyebrow">Round 1 — Finland moves first</p>
+  <h2 class="section-title">Russia has announced<br>the exercises.<br><em>What do you do?</em></h2>
+  <p class="body-text">Before you choose, ask yourself the three questions: what constraint forces this? What does it cost? Can you walk it back?</p>
+
+  <div class="move-prompt">Choose your move</div>
+  <div class="move-options">
+    <button class="move-btn" onclick="r1('A')">
+      <span class="move-btn-label">Option A — Military signal</span>
+      <span class="move-btn-title">Announce a partial reserve mobilisation</span>
+      <span class="move-btn-desc">Call up 50,000 reservists publicly, on television. Routine under Finnish law, near zero cost. The number 280,000 has a specific meaning in Russian military planning.</span>
+    </button>
+    <button class="move-btn" onclick="r1('B')">
+      <span class="move-btn-label">Option B — Alliance procedure</span>
+      <span class="move-btn-title">Invoke Article 4 — formal NATO consultation</span>
+      <span class="move-btn-desc">Force all 32 NATO members to convene and publicly state their position. Procedural, no troops committed. Forces Germany and Hungary into the room on the record.</span>
+    </button>
+    <button class="move-btn" onclick="r1('C')">
+      <span class="move-btn-label">Option C — Silent bilateral</span>
+      <span class="move-btn-title">Back-channel directly to Washington</span>
+      <span class="move-btn-desc">Bypass NATO as an institution entirely. Contact the US Secretary of Defense bilaterally, outside the alliance framework. No public signal. A private bet on the one commitment that actually matters.</span>
+    </button>
+  </div>
+</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SCREEN: ROUND 1 REACTIONS — PATH A
+══════════════════════════════════════════ -->
+<div id="s-r1a" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step">Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step">Autopsy</span>
+  </div>
+
+  <p class="eyebrow">Round 1 — Finland played</p>
+  <div class="scenario-box">
+    <div class="scenario-label">Your move — on the record</div>
+    <p class="scenario-text">Finland announces a partial reserve mobilisation of 50,000 troops on national television. The defence minister speaks for four minutes. No aggression claimed. No ultimatum issued. The number 280,000 is mentioned once.</p>
+  </div>
+
+  <p class="body-text">The other actors respond.</p>
+
+  <div id="ra1-nato" class="event">
+    <div class="event-actor nato">NATO — Brussels</div>
+    <p class="event-text">No public statement. Overnight, NATO quietly pre-positions surveillance equipment and communications infrastructure in Finnish military depots — under Finnish command, no foreign troops. Action, not words.</p>
+  </div>
+  <div id="ra1-russia" class="event">
+    <div class="event-actor russia">Russia — Moscow</div>
+    <p class="event-text">Russian naval vessels begin "freedom of navigation" patrols in international waters south of Helsinki. Legal. Unprecedented in this density. Three frigates. No announcement — revealed by Finnish coastguard tracking data the following morning.</p>
+  </div>
+
+  <div id="ra1-friction" class="friction-card">
+    <div class="friction-label">Friction card — drawn before round 2</div>
+    <div class="friction-title">The Cyberattack</div>
+    <p class="friction-text">Helsinki's power grid fails at 02:14. Eleven hospitals on backup generators. Three Baltic port control systems go dark. Attribution is technically contested — the signature is consistent with a state actor but deliberately ambiguous. Eleven hours of blackout. NATO legal counsel's internal assessment: <em>"Unclear whether this meets the Article 5 threshold."</em></p>
+  </div>
+
+  <div id="ra1-continue" class="hidden btn-row">
+    <button class="btn-primary" onclick="go('s-r2a')">Round 2 — respond to the attack →</button>
+  </div>
+</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SCREEN: ROUND 1 REACTIONS — PATH B
+══════════════════════════════════════════ -->
+<div id="s-r1b" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step">Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step">Autopsy</span>
+  </div>
+
+  <p class="eyebrow">Round 1 — Finland played</p>
+  <div class="scenario-box">
+    <div class="scenario-label">Your move — on the record</div>
+    <p class="scenario-text">Finland formally invokes Article 4, requesting an emergency NATO consultation. All 32 member states are summoned. The request is procedurally correct, diplomatically restrained, and publicly visible. Helsinki frames it as "a precautionary measure consistent with alliance obligations."</p>
+  </div>
+
+  <p class="body-text">The other actors respond.</p>
+
+  <div id="rb1-nato" class="event">
+    <div class="event-actor nato">NATO — Brussels</div>
+    <p class="event-text">The meeting convenes within 18 hours. All 32 members attend. The joint communiqué runs to four paragraphs and expresses "serious concern," calling for "de-escalation." It does not name Russia. Germany says nothing publicly.</p>
+  </div>
+  <div id="rb1-russia" class="event">
+    <div class="event-actor russia">Russia — Moscow</div>
+    <p class="event-text">A Russian foreign ministry source leaks to Der Spiegel: "Finland is asking NATO to fight its battles. The alliance's silence speaks for itself." The story runs within six hours of the communiqué. Three German tabloids carry it. Finland did not put that narrative into circulation — but your move made it available.</p>
+  </div>
+
+  <div id="rb1-friction" class="friction-card">
+    <div class="friction-label">Friction card — drawn before round 2</div>
+    <div class="friction-title">The Cyberattack</div>
+    <p class="friction-text">Helsinki's power grid fails at 02:14. Eleven hospitals on backup generators. Three Baltic port control systems go dark. Attribution is technically contested — the signature is consistent with a state actor but deliberately ambiguous. Eleven hours of blackout. NATO legal counsel's internal assessment: <em>"Unclear whether this meets the Article 5 threshold."</em></p>
+  </div>
+
+  <div id="rb1-continue" class="hidden btn-row">
+    <button class="btn-primary" onclick="go('s-r2b')">Round 2 — respond to the attack →</button>
+  </div>
+</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SCREEN: ROUND 1 REACTIONS — PATH C
+══════════════════════════════════════════ -->
+<div id="s-r1c" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step">Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step">Autopsy</span>
+  </div>
+
+  <p class="eyebrow">Round 1 — Finland played</p>
+  <div class="scenario-box">
+    <div class="scenario-label">Your move — on the record</div>
+    <p class="scenario-text">Finland makes no public statement. The defence minister contacts the US Secretary of Defense by secure line. The call lasts 22 minutes. Helsinki requests a private, bilateral security assurance outside the NATO framework. Washington acknowledges receipt. No commitment yet.</p>
+  </div>
+
+  <p class="body-text">The other actors respond to your silence.</p>
+
+  <div id="rc1-nato" class="event">
+    <div class="event-actor nato">NATO — Brussels</div>
+    <p class="event-text">Brussels notices that Finland has made no public move and issued no consultation request. No action is taken. NATO monitors the situation. The institutional machinery does not move without a trigger.</p>
+  </div>
+  <div id="rc1-russia" class="event">
+    <div class="event-actor russia">Russia — Moscow</div>
+    <p class="event-text">Finnish public silence is read in Moscow as hesitation — or a sign the bilateral call to Washington has not yet produced results. Russian naval posture in the Gulf of Finland is quietly reinforced. A fourth frigate joins the patrol. No announcement.</p>
+  </div>
+  <div id="rc1-wash" class="event">
+    <div class="event-actor washington">Washington — Pentagon</div>
+    <p class="event-text">36 hours pass. No answer from Washington. The call is being "reviewed at the appropriate level." This is the language of delay, not refusal — but the distinction is not yet visible from Helsinki.</p>
+  </div>
+
+  <div id="rc1-friction" class="friction-card">
+    <div class="friction-label">Friction card — drawn before round 2</div>
+    <div class="friction-title">The Cyberattack</div>
+    <p class="friction-text">Helsinki's power grid fails at 02:14. Eleven hospitals on backup generators. Three Baltic port control systems go dark. Attribution is technically contested — the signature is consistent with a state actor but deliberately ambiguous. Eleven hours of blackout. NATO legal counsel's internal assessment: <em>"Unclear whether this meets the Article 5 threshold."</em></p>
+  </div>
+
+  <div id="rc1-continue" class="hidden btn-row">
+    <button class="btn-primary" onclick="go('s-r2c')">Round 2 — respond to the attack →</button>
+  </div>
+</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SCREEN: ROUND 2 — PATH A
+══════════════════════════════════════════ -->
+<div id="s-r2a" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step">Autopsy</span>
+  </div>
+
+  <p class="eyebrow">Round 2 — the grid is down</p>
+  <h2 class="section-title">The attack has happened.<br><em>What do you do now?</em></h2>
+
+  <div class="r2-context">
+    <div class="r2-context-label">Where you stand entering round 2</div>
+    <p class="r2-context-text">You mobilised visibly. NATO pre-positioned hardware quietly. Russia is now in the Gulf of Finland with four frigates. The cyberattack came anyway — below the Article 5 threshold. Attribution is contested. NATO legal is deliberating. Every hour without a response writes a precedent.</p>
+  </div>
+
+  <div class="move-prompt">Choose your move</div>
+  <div class="move-options">
+    <button class="move-btn" onclick="go('s-autopsy-a1')">
+      <span class="move-btn-label">Option A1 — Force the alliance</span>
+      <span class="move-btn-title">Demand NATO invoke Article 5 publicly</span>
+      <span class="move-btn-desc">Name Russia. Demand the alliance answer. Force every member state on the record — including Germany. Make this the moment that defines what Article 5 actually means.</span>
+    </button>
+    <button class="move-btn" onclick="go('s-autopsy-a2')">
+      <span class="move-btn-label">Option A2 — Absorb and deny</span>
+      <span class="move-btn-title">Activate cyber defence protocols — say nothing publicly</span>
+      <span class="move-btn-desc">Restore the grid. Harden systems. Issue no statement. Deny Russia a reaction to read. Let NATO legal continue deliberating without being forced into a public position it may not be ready to take.</span>
+    </button>
+    <button class="move-btn" onclick="go('s-autopsy-a3')">
+      <span class="move-btn-label">Option A3 — Military escalation</span>
+      <span class="move-btn-title">Deploy a battalion to the border — 'joint training' designation</span>
+      <span class="move-btn-desc">Move troops to the Finnish border under a training cover. Legal, deniable on paper — but impossible to misread. You already mobilised reserves. This is the next step on the ladder.</span>
+    </button>
+  </div>
+</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SCREEN: ROUND 2 — PATH B
+══════════════════════════════════════════ -->
+<div id="s-r2b" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step">Autopsy</span>
+  </div>
+
+  <p class="eyebrow">Round 2 — the grid is down</p>
+  <h2 class="section-title">The attack has happened.<br><em>What do you do now?</em></h2>
+
+  <div class="r2-context">
+    <div class="r2-context-label">Where you stand entering round 2</div>
+    <p class="r2-context-text">You went procedural. 32 members convened and produced a communiqué with no name in it. The Der Spiegel narrative is in circulation. The cyberattack came anyway. You enter this round with alliance goodwill and a damaged public image.</p>
+  </div>
+
+  <div class="move-prompt">Choose your move</div>
+  <div class="move-options">
+    <button class="move-btn" onclick="go('s-autopsy-b1')">
+      <span class="move-btn-label">Option B1 — Go public</span>
+      <span class="move-btn-title">Hold a press conference — name Russia directly</span>
+      <span class="move-btn-desc">Stand in front of cameras. Attribute the attack to Russia explicitly. Force the attribution question into the open. Reclaim the narrative that Der Spiegel took from you.</span>
+    </button>
+    <button class="move-btn" onclick="go('s-autopsy-b2')">
+      <span class="move-btn-label">Option B2 — Go bilateral</span>
+      <span class="move-btn-title">Request a written security guarantee from Washington — privately</span>
+      <span class="move-btn-desc">Bypass NATO a second time. Ask the US directly for a named, written, bilateral commitment — something the alliance communiqué was never going to provide.</span>
+    </button>
+  </div>
+</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SCREEN: ROUND 2 — PATH C
+══════════════════════════════════════════ -->
+<div id="s-r2c" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step">Autopsy</span>
+  </div>
+
+  <p class="eyebrow">Round 2 — the grid is down</p>
+  <h2 class="section-title">The attack has happened.<br><em>What do you do now?</em></h2>
+
+  <div class="r2-context">
+    <div class="r2-context-label">Where you stand entering round 2</div>
+    <p class="r2-context-text">You went silent. Washington has not answered. NATO is cold — it received no trigger from you. Russia reinforced its naval posture while you waited. The cyberattack came before you heard back from the Pentagon. You are now in a crisis with no public position, a cold alliance, and an open bilateral channel that may or may not deliver.</p>
+  </div>
+
+  <div class="move-prompt">Choose your move</div>
+  <div class="move-options">
+    <button class="move-btn" onclick="go('s-autopsy-c1')">
+      <span class="move-btn-label">Option C1 — Break silence</span>
+      <span class="move-btn-title">Invoke Article 4 now — 36 hours late</span>
+      <span class="move-btn-desc">Enter the alliance framework from a weaker position. The delay will be noticed — by every member, and by Russia. But the alternative is to remain publicly invisible during a live crisis.</span>
+    </button>
+    <button class="move-btn" onclick="go('s-autopsy-c2')">
+      <span class="move-btn-label">Option C2 — Hold</span>
+      <span class="move-btn-title">Wait for Washington — say nothing</span>
+      <span class="move-btn-desc">Every hour of continued silence is a bet that the bilateral call worked. You have no confirmation yet. But breaking silence now may signal to Washington that you don't trust the channel — and close it.</span>
+    </button>
+  </div>
+</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     AUTOPSY SCREENS — 6 PATHS
+══════════════════════════════════════════ -->
+
+<!-- A1 -->
+<div id="s-autopsy-a1" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Autopsy</span>
+  </div>
+  <p class="eyebrow">Economic autopsy — path A → A1</p>
+  <h2 class="section-title">Follow<br><em>the chain.</em></h2>
+  <p class="body-text">Trace what happened across both rounds — and what each move cost.</p>
+  <hr class="divider">
+  <div class="autopsy-label">The causal chain</div>
+  <div class="chain">
+    <div class="chain-step"><span class="chain-arrow">1</span><span class="chain-text"><strong>Finland mobilised visibly.</strong> NATO acted quietly. Russia answered at sea. The cyberattack came below the Article 5 threshold.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Finland demanded Article 5 publicly.</strong> Every member state was now on the record — including Germany, which had not yet decided what it believed.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Germany hedged publicly.</strong> Hungary blocked. The alliance did not move unanimously. Russia watched the fracture happen in real time — in open session.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Your demand became Russia's evidence.</strong> The alliance's inability to invoke Article 5 on a cyberattack of contested attribution is now documented, public, and available for use in every future pressure campaign.</span></div>
+  </div>
+  <div class="cost-box"><div class="cost-label">What you controlled</div><p class="cost-text">The decision to force the question. If the alliance had held, this would have been the defining moment of collective defence for a generation.</p></div>
+  <div class="cost-box" style="margin-top:12px;"><div class="cost-label">What you did not control</div><p class="cost-text">Germany's calculation. Hungary's veto logic. The gap between Article 5's rhetoric and the political unanimity it requires in practice.</p></div>
+  <div class="lesson-box"><div class="lesson-label">The structural lesson</div><p class="lesson-text">Forcing an alliance to commit publicly before it is ready does not produce commitment. It produces a fracture — and a fracture in public is a document your adversary will cite for years.</p></div>
+  <div class="cliffhanger">
+    <p class="cliff-text">"The grid is back. NATO legal is still deliberating. Every hour without a response is a precedent being written. In a real session, this is where round 3 begins — and everyone at the table now knows something about every other actor that they did not know two hours ago."</p>
+    <p class="cliff-sub">What happens next depends on who is in the room —<br>and whether they have done the reading.</p>
+    <a href="index.html#apply" class="btn-primary">Apply to join a session</a>
+    <button class="btn-ghost" onclick="restart()" style="margin-top:12px;">Play again — different path</button>
+  </div>
+</div>
+</div>
+
+<!-- A2 -->
+<div id="s-autopsy-a2" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Autopsy</span>
+  </div>
+  <p class="eyebrow">Economic autopsy — path A → A2</p>
+  <h2 class="section-title">Follow<br><em>the chain.</em></h2>
+  <p class="body-text">Trace what happened across both rounds — and what each move cost.</p>
+  <hr class="divider">
+  <div class="autopsy-label">The causal chain</div>
+  <div class="chain">
+    <div class="chain-step"><span class="chain-arrow">1</span><span class="chain-text"><strong>Finland mobilised visibly.</strong> NATO pre-positioned hardware. Russia answered at sea. The cyberattack came below the threshold.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Finland absorbed the attack in silence.</strong> The grid was restored. No public statement. NATO legal continued deliberating without being forced into a position it wasn't ready to take.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Russia received no reaction to read.</strong> The information environment stayed under Finnish control. The naval posture in the Gulf remained — but did not escalate.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>The precedent was set anyway.</strong> A cyberattack on a NATO member went publicly unanswered. Russia did not need a statement from Helsinki to understand what that means.</span></div>
+  </div>
+  <div class="cost-box"><div class="cost-label">What you controlled</div><p class="cost-text">The information environment. You denied Russia a reaction. NATO kept its posture. You preserved options — and gave yourself time.</p></div>
+  <div class="cost-box" style="margin-top:12px;"><div class="cost-label">What you did not control</div><p class="cost-text">The precedent. Silence is also a signal. Your adversary reads absence as carefully as presence — and what they read is that this attack had no consequence.</p></div>
+  <div class="lesson-box"><div class="lesson-label">The structural lesson</div><p class="lesson-text">Absorbing an attack preserves options and denies your adversary a reaction to exploit. But silence also writes a precedent — and a precedent is a standing invitation to repeat the move.</p></div>
+  <div class="cliffhanger">
+    <p class="cliff-text">"The grid is back. NATO legal is still deliberating. Every hour without a response is a precedent being written. In a real session, this is where round 3 begins — and everyone at the table now knows something about every other actor that they did not know two hours ago."</p>
+    <p class="cliff-sub">What happens next depends on who is in the room —<br>and whether they have done the reading.</p>
+    <a href="index.html#apply" class="btn-primary">Apply to join a session</a>
+    <button class="btn-ghost" onclick="restart()" style="margin-top:12px;">Play again — different path</button>
+  </div>
+</div>
+</div>
+
+<!-- B1 -->
+<div id="s-autopsy-b1" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Autopsy</span>
+  </div>
+  <p class="eyebrow">Economic autopsy — path B → B1</p>
+  <h2 class="section-title">Follow<br><em>the chain.</em></h2>
+  <p class="body-text">Trace what happened across both rounds — and what each move cost.</p>
+  <hr class="divider">
+  <div class="autopsy-label">The causal chain</div>
+  <div class="chain">
+    <div class="chain-step"><span class="chain-arrow">1</span><span class="chain-text"><strong>Finland invoked Article 4.</strong> A communiqué with no name in it. The Der Spiegel narrative framed Finland as a supplicant before the cyberattack arrived.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Finland named Russia publicly.</strong> The press conference ran live across European networks. Attribution was stated as fact.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Russia denied and demanded proof.</strong> The technical evidence is genuinely contested. Finland owns the narrative but not the evidence. Every outlet that ran the denial is now a battlefield.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>NATO still cannot invoke Article 5</strong> on contested attribution. You reclaimed the story — but the legal threshold remains exactly where it was before you spoke.</span></div>
+  </div>
+  <div class="cost-box"><div class="cost-label">What you controlled</div><p class="cost-text">The narrative. You named the actor. You were first. In the long run, first attributions tend to stick — even contested ones.</p></div>
+  <div class="cost-box" style="margin-top:12px;"><div class="cost-label">What you did not control</div><p class="cost-text">The evidence. Russia's denial moves at the same speed as your accusation. Without uncontested proof, you handed them the next move — and they took it.</p></div>
+  <div class="lesson-box"><div class="lesson-label">The structural lesson</div><p class="lesson-text">Public attribution without uncontested evidence does not end a narrative war — it begins one. And in a narrative war, the actor with less to lose from ambiguity has the structural advantage.</p></div>
+  <div class="cliffhanger">
+    <p class="cliff-text">"The grid is back. NATO legal is still deliberating. Every hour without a response is a precedent being written. In a real session, this is where round 3 begins — and everyone at the table now knows something about every other actor that they did not know two hours ago."</p>
+    <p class="cliff-sub">What happens next depends on who is in the room —<br>and whether they have done the reading.</p>
+    <a href="index.html#apply" class="btn-primary">Apply to join a session</a>
+    <button class="btn-ghost" onclick="restart()" style="margin-top:12px;">Play again — different path</button>
+  </div>
+</div>
+</div>
+
+<!-- B2 -->
+<div id="s-autopsy-b2" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Autopsy</span>
+  </div>
+  <p class="eyebrow">Economic autopsy — path B → B2</p>
+  <h2 class="section-title">Follow<br><em>the chain.</em></h2>
+  <p class="body-text">Trace what happened across both rounds — and what each move cost.</p>
+  <hr class="divider">
+  <div class="autopsy-label">The causal chain</div>
+  <div class="chain">
+    <div class="chain-step"><span class="chain-arrow">1</span><span class="chain-text"><strong>Finland invoked Article 4.</strong> The communiqué named nothing. The Der Spiegel narrative was already running. Then the cyberattack arrived.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Finland bypassed NATO a second time</strong> — requesting a bilateral written guarantee from Washington. Brussels noticed. This is the second time Finland has gone around the institution in 48 hours.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Washington responded positively, conditionally.</strong> A private written assurance arrived — real, specific, and entirely dependent on the current administration's willingness to honour it.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>NATO is now actively cold.</strong> You have a US commitment and a fractured alliance. These are not equivalent assets — and one of them is not guaranteed to exist in four years.</span></div>
+  </div>
+  <div class="cost-box"><div class="cost-label">What you controlled</div><p class="cost-text">The bilateral relationship. You got a real commitment — specific, written, and more concrete than anything the alliance communiqué was ever going to produce.</p></div>
+  <div class="cost-box" style="margin-top:12px;"><div class="cost-label">What you did not control</div><p class="cost-text">The institution's memory. NATO does not forget when a member goes around it twice. The commitment you secured is also the most fragile kind — it lives in a relationship, not a treaty.</p></div>
+  <div class="lesson-box"><div class="lesson-label">The structural lesson</div><p class="lesson-text">The bilateral relationship can be stronger than the collective one — but using it costs you the institution. And institutions outlast administrations.</p></div>
+  <div class="cliffhanger">
+    <p class="cliff-text">"The grid is back. NATO legal is still deliberating. Every hour without a response is a precedent being written. In a real session, this is where round 3 begins — and everyone at the table now knows something about every other actor that they did not know two hours ago."</p>
+    <p class="cliff-sub">What happens next depends on who is in the room —<br>and whether they have done the reading.</p>
+    <a href="index.html#apply" class="btn-primary">Apply to join a session</a>
+    <button class="btn-ghost" onclick="restart()" style="margin-top:12px;">Play again — different path</button>
+  </div>
+</div>
+</div>
+
+<!-- C1 -->
+<div id="s-autopsy-c1" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Autopsy</span>
+  </div>
+  <p class="eyebrow">Economic autopsy — path C → C1</p>
+  <h2 class="section-title">Follow<br><em>the chain.</em></h2>
+  <p class="body-text">Trace what happened across both rounds — and what each move cost.</p>
+  <hr class="divider">
+  <div class="autopsy-label">The causal chain</div>
+  <div class="chain">
+    <div class="chain-step"><span class="chain-arrow">1</span><span class="chain-text"><strong>Finland went silent.</strong> Washington received the call but had not answered. NATO received no trigger. Russia reinforced its naval posture while Finland waited.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>The cyberattack arrived before Washington answered.</strong> Finland entered the crisis without a public position, a cold alliance, and an open channel that had produced nothing visible.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Finland invoked Article 4 — 36 hours late.</strong> Every member state read the timing. A late trigger is not a strong trigger. The delay was visible, and visibility is part of the signal.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Russia read the sequence correctly:</strong> the bilateral call failed to produce a response, forcing Finland back to the institution it had initially bypassed. The delay confirmed the hierarchy of Finland's options — and their limits.</span></div>
+  </div>
+  <div class="cost-box"><div class="cost-label">What you controlled</div><p class="cost-text">The eventual return to the alliance framework. You got the Article 4 meeting — and you are now inside the institutional process, however late.</p></div>
+  <div class="cost-box" style="margin-top:12px;"><div class="cost-label">What you did not control</div><p class="cost-text">The reading of your delay. Every actor at the table — including your allies — now knows that your first instinct was to go around the institution. That information does not disappear.</p></div>
+  <div class="lesson-box"><div class="lesson-label">The structural lesson</div><p class="lesson-text">A delayed signal is read as a failed signal. Timing is not context — it is content. The gap between when something happened and when you responded to it tells your adversary something you did not intend to say.</p></div>
+  <div class="cliffhanger">
+    <p class="cliff-text">"The grid is back. NATO legal is still deliberating. Every hour without a response is a precedent being written. In a real session, this is where round 3 begins — and everyone at the table now knows something about every other actor that they did not know two hours ago."</p>
+    <p class="cliff-sub">What happens next depends on who is in the room —<br>and whether they have done the reading.</p>
+    <a href="index.html#apply" class="btn-primary">Apply to join a session</a>
+    <button class="btn-ghost" onclick="restart()" style="margin-top:12px;">Play again — different path</button>
+  </div>
+</div>
+</div>
+
+<!-- A3 -->
+<div id="s-autopsy-a3" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Autopsy</span>
+  </div>
+  <p class="eyebrow">Economic autopsy — path A → A3</p>
+  <h2 class="section-title">Follow<br><em>the chain.</em></h2>
+  <p class="body-text">Trace what happened across both rounds — and what each move cost.</p>
+  <hr class="divider">
+  <div class="autopsy-label">The causal chain</div>
+  <div class="chain">
+    <div class="chain-step"><span class="chain-arrow">1</span><span class="chain-text"><strong>Finland mobilised reserves visibly.</strong> NATO pre-positioned hardware. Russia answered at sea with four frigates. The cyberattack came below the Article 5 threshold.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Finland deployed a battalion to the border.</strong> Designated as joint training. The move followed the same logic as round 1 — visible, signal-based, military. A consistent posture, escalated one tier.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Russia now faces a different cost calculation.</strong> A cyberattack on a country with active troop deployments at the border is harder to frame as a proportionate, deniable act. The theatre has shifted from digital to physical.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>But the question changed.</strong> You responded to a cyberattack with a ground troop movement. Those are different domains. NATO legal, already deliberating on the Article 5 threshold for the cyber event, must now also assess the ground escalation — two open questions, not one.</span></div>
+  </div>
+  <div class="cost-box"><div class="cost-label">What you controlled</div><p class="cost-text">The physical domain. Troops on the border are unambiguous. Russia cannot contest their presence the way they contested the cyberattack's attribution. The signal is clear.</p></div>
+  <div class="cost-box" style="margin-top:12px;"><div class="cost-label">What you did not control</div><p class="cost-text">The domain mismatch. You answered a cyber provocation with a ground signal. Your adversary can now argue you escalated disproportionately — and that argument has an audience in Berlin and Budapest.</p></div>
+  <div class="lesson-box"><div class="lesson-label">The structural lesson</div><p class="lesson-text">Responding to an attack in a different domain does not de-escalate — it opens a second front. Your adversary now has two theatres to work with, and you only have one argument for why you acted.</p></div>
+  <div class="cliffhanger">
+    <p class="cliff-text">"The grid is back. A Finnish battalion is on the border. NATO legal is deliberating on two simultaneous questions. Every hour without a response writes a precedent — and there are now two precedents being written at once."</p>
+    <p class="cliff-sub">What happens next depends on who is in the room —<br>and whether they have done the reading.</p>
+    <a href="index.html#apply" class="btn-primary">Apply to join a session</a>
+    <button class="btn-ghost" onclick="restart()" style="margin-top:12px;">Play again — different path</button>
+  </div>
+</div>
+</div>
+
+<!-- C2 -->
+<div id="s-autopsy-c2" class="screen">
+<div class="page fadein">
+  <div class="progress">
+    <span class="prog-step done"><span class="prog-dot"></span>Brief</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Your card</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 1</span>
+    <span class="prog-sep">/</span><span class="prog-step done">Round 2</span>
+    <span class="prog-sep">/</span><span class="prog-step current"><span class="prog-dot"></span>Autopsy</span>
+  </div>
+  <p class="eyebrow">Economic autopsy — path C → C2</p>
+  <h2 class="section-title">Follow<br><em>the chain.</em></h2>
+  <p class="body-text">Trace what happened across both rounds — and what each move cost.</p>
+  <hr class="divider">
+  <div class="autopsy-label">The causal chain</div>
+  <div class="chain">
+    <div class="chain-step"><span class="chain-arrow">1</span><span class="chain-text"><strong>Finland went silent and held.</strong> The bilateral channel stayed open. NATO received no trigger. Russia reinforced its naval posture.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>The cyberattack arrived. Finland stayed silent.</strong> The bet held — Washington answered. A private, specific, bilateral security commitment was transmitted through secure channels. No press conference.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>Russia had no public reaction to exploit.</strong> No narrative war was possible. The commitment existed — but invisibly. From Moscow's perspective, Helsinki had absorbed a cyberattack and said nothing.</span></div>
+    <div class="chain-step"><span class="chain-arrow">→</span><span class="chain-text"><strong>The commitment is real but fragile.</strong> It lives in a relationship between two governments, not in a treaty. It is not ratified, not public, and not guaranteed to survive a change of administration in Washington.</span></div>
+  </div>
+  <div class="cost-box"><div class="cost-label">What you controlled</div><p class="cost-text">Everything visible. You gave Russia nothing to respond to. You kept the information environment closed. You secured a real commitment through the channel you opened.</p></div>
+  <div class="cost-box" style="margin-top:12px;"><div class="cost-label">What you did not control</div><p class="cost-text">The durability of the commitment. A private guarantee is only as strong as the relationship that produced it — and relationships change. Treaties don't.</p></div>
+  <div class="lesson-box"><div class="lesson-label">The structural lesson</div><p class="lesson-text">The most powerful guarantee is also the most fragile. It exists only as long as the phone call holds — and phone calls depend on who answers.</p></div>
+  <div class="cliffhanger">
+    <p class="cliff-text">"The grid is back. NATO legal is still deliberating. Every hour without a response is a precedent being written. In a real session, this is where round 3 begins — and everyone at the table now knows something about every other actor that they did not know two hours ago."</p>
+    <p class="cliff-sub">What happens next depends on who is in the room —<br>and whether they have done the reading.</p>
+    <a href="index.html#apply" class="btn-primary">Apply to join a session</a>
+    <button class="btn-ghost" onclick="restart()" style="margin-top:12px;">Play again — different path</button>
+  </div>
+</div>
+</div>
+
+
+<script>
+  function go(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function r1(path) {
+    const screenMap = { A: 's-r1a', B: 's-r1b', C: 's-r1c' };
+    go(screenMap[path]);
+
+    const ids = {
+      A: ['ra1-nato', 'ra1-russia', 'ra1-friction', 'ra1-continue'],
+      B: ['rb1-nato', 'rb1-russia', 'rb1-friction', 'rb1-continue'],
+      C: ['rc1-nato', 'rc1-russia', 'rc1-wash', 'rc1-friction', 'rc1-continue']
+    };
+
+    const elIds = ids[path];
+    const delays = path === 'C' ? [600, 1800, 3000, 4400, 6200] : [600, 1900, 3400, 5200];
+
+    elIds.forEach((id, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (id.includes('continue')) {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('visible');
+        }
+      }, delays[i]);
+    });
+  }
+
+  function restart() {
+    const toReset = [
+      'ra1-nato','ra1-russia','ra1-friction',
+      'rb1-nato','rb1-russia','rb1-friction',
+      'rc1-nato','rc1-russia','rc1-wash','rc1-friction'
+    ];
+    toReset.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('visible');
+    });
+    ['ra1-continue','rb1-continue','rc1-continue'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
+    });
+    go('s-r1');
+  }
+</script>
+</body>
+</html>
